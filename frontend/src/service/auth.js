@@ -6,13 +6,12 @@ export async function login(data){
         headers: {
             'content-type': "application/json",
         },
-        data: JSON.stringify(data)
+        body: JSON.stringify(data)
     })
 
     if(!res.ok) return {msg: "Require fail"}
 
-    const data = await res.json()
-    return data;
+    return await res.json();
 }
 
 
@@ -28,6 +27,5 @@ export async function SignUp(data){
 
     if(!res.ok) return {msg: "Require fail"}
 
-    const data = await res.json()
-    return data;
+    return await res.json();
 }

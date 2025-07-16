@@ -1,9 +1,12 @@
 const express = require('express');
 const authRouter = require('./routes/auth-route');
 const connectToDb = require('./middlewares/conntect-to-db');
+const cors = require('cors')
 
 const app = express();
-
+app.use(cors({
+    origin: '*'
+}))
 
 app.use(express.json());
 app.use(express.urlencoded());

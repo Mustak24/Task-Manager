@@ -1,5 +1,5 @@
 
-export function InputText({label, placeholder, className='', labelColor='black', labelBg='white', id=null, name='', color='white', bg='transparent', borderStyle='solid', borderWidth='2px', errorMsg=''}){
+export function InputText({label, placeholder, className='', labelColor='black', labelBg='white', id=null, name='', color='white', bg='transparent', borderStyle='solid', borderWidth='2px', errorMsg='', ...props}){
     if(!id) id = String(Math.floor(Math.random()*10000));
 
     return <div>
@@ -28,6 +28,7 @@ export function InputText({label, placeholder, className='', labelColor='black',
                 }}
             >{label}</label>
             <input 
+                {...props}
                 id={id} 
                 name={name} 
                 className="outline-none flex items-center w-full h-full px-5 rounded-[12px] pt-2" 

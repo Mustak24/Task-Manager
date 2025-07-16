@@ -26,7 +26,7 @@ async function Login(req, res) {
 
         const user = await UserModel.findOne({username});
 
-        if(!user && !user.isValidPassword(password)) return res.json({msg: "Invalid username and password !!!"})
+        if(!user || !user.isValidPassword(password)) return res.json({msg: "Invalid username and password !!!"})
         
         const token = user.createToken();
         return res.json({msg: 'user was created', token});
