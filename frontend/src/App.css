@@ -12,6 +12,6 @@ body, html {
 
 #root {
   background-color: black;
-  width: 100vw;
+  width: 100%;
   flex: 1;
 }

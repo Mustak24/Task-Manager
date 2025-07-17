@@ -22,7 +22,7 @@ export async function SignUp(data){
         headers: {
             'content-type': "application/json",
         },
-        data: JSON.stringify(data)
+        body: JSON.stringify(data)
     })
 
     if(!res.ok) return {msg: "Require fail"}

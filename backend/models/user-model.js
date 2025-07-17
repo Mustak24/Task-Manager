@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 
 const UserSchema = new mongoose.Schema({
+    name: String,
+
     username: {
         type: String,
         required: true,
@@ -31,7 +33,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre('save', function() {
     if(!this.isModified('password')) return;
     this.password = bcrypt.hashSync(this.password, bcrypt.genSaltSync(10));
-    return
+    return;
 })
 
 UserSchema.methods.isValidPassword = function(password) {

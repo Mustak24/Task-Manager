@@ -2,11 +2,13 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/elements/Button";
 import { InputText } from "../components/elements/Input";
 import { login } from "../service/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useStore } from "../context/StoreProvider";
 
 export default function LoginPage() {
 
     const navigation = useNavigate();
+    const {fetchUserInfo, userInfo} = useStore();
 
     const [isLoading, setLoading] = useState(false);
     const [errorMSg, setErrorMsg] = useState({ username: '', password: "", res: '' });
@@ -31,12 +33,21 @@ export default function LoginPage() {
 
         if (res.token) {
             localStorage.setItem('token', res.token);
-            return navigation('/profile');
+            fetchUserInfo();
+            return navigation('/home');
         }
 
         setError('res', res.msg)
-        console.log(res.msg, errorMSg)
     }
+
+    useEffect(() => {
+        fetchUserInfo();
+    }, [])
+
+    useEffect(() => {
+        if(!localStorage.getItem('token')) return
+        if(userInfo.role) navigation('/home')
+    }, [userInfo])
 
     return (
         <div className="w-full h-full flex items-center justify-center" >

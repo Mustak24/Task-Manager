@@ -1,6 +1,13 @@
+import { useEffect, useState } from "react";
 
-export function InputText({label, placeholder, className='', labelColor='black', labelBg='white', id=null, name='', color='white', bg='transparent', borderStyle='solid', borderWidth='2px', errorMsg='', ...props}){
+export function InputText({label, placeholder, className='', labelColor='black', labelBg='white', id=null, name='', color='white', bg='transparent', borderStyle='solid', borderWidth='2px', errorMsg='', value='', onChange, ...props}){
     if(!id) id = String(Math.floor(Math.random()*10000));
+
+    const [text, setText] = useState(value);
+
+    useEffect(() => {
+        setText(value)
+    }, [value])
 
     return <div>
         <div 
@@ -31,6 +38,8 @@ export function InputText({label, placeholder, className='', labelColor='black',
                 {...props}
                 id={id} 
                 name={name} 
+                value={text}
+                onChange={(e) => {setText(e.target.value); if(onChange) onChange(e);}}
                 className="outline-none flex items-center w-full h-full px-5 rounded-[12px] pt-2" 
                 type="text" 
                 placeholder={placeholder}
