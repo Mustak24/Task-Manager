@@ -1,5 +1,5 @@
 const express = require('express');
-const { getUser, updatePassword, getAllUsers, getUserById } = require('../controlers/user-controler');
+const { getUser, updatePassword, getAllUsers, getUserById, updateRole } = require('../controlers/user-controler');
 const isAllow = require('../middlewares/is-allow');
 
 
@@ -16,3 +16,4 @@ userRoute.get('/:id', getUserById);
 userRoute.put('/', getUser);
 
 userRoute.post('/update-password', updatePassword);
+userRoute.patch('/role', isAllow('admin'), updateRole);

@@ -69,4 +69,22 @@ async function getUserById(req, res) {
     }
 }
 
-module.exports = { getUser, updatePassword, getAllUsers, getUserById }
+
+async function updateRole(req, res) {
+    try {
+        const {role, id} = req.body;
+
+        if(role === 'admin')
+            return res.status(400).json({msg: 'invalid requiest !!!'})
+
+        const user = await UserModel.findByIdAndUpdate(id, {role: role})
+
+        if(!user) return res.status(400).json({msg: "not update"});
+        return res.json({msg: 'updated'}); 
+    }catch(e) {
+        console.log(e);
+        return res.status(500).json({msg: "INternal server error"})
+    }
+}
+
+module.exports = { getUser, updatePassword, getAllUsers, getUserById, updateRole }

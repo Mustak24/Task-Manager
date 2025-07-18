@@ -1,13 +1,16 @@
 import Navbar from "../components/layout/Navbar";
 import { MdDeleteForever } from "react-icons/md";
 import { FiLogOut, FiUsers } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "../context/StoreProvider";
 import { FiChevronRight, FiUser, FiKey } from "react-icons/fi";
+import { IoSearchOutline } from "react-icons/io5";
 import CenterModal from "../components/layout/CenterModal";
 import { InputText } from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { useNavigate } from "react-router-dom";
+import { updatePassword, updateRole } from "../service/user";
+import UnderlineText from "../components/elements/UnderlineText";
 
 export default function SettingPage() {
 
@@ -16,6 +19,7 @@ export default function SettingPage() {
 
     const [isInfoUpdateModalVisible, setInfoUpdateModalVisible] = useState(false);
     const [isPasswordModalVisible, setPasswordModalVisible] = useState(false);
+    const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
 
 
     useEffect(() => {
@@ -91,24 +95,28 @@ export default function SettingPage() {
                 <div className="flex flex-col items-center w-full gap-3" >
                     <div className="self-start text-md pl-2 opacity-80 font-semibold">Other</div>
 
-                    <button 
-                        onClick={() => {}}
-                        className="rounded-lg bg-zinc-900 w-full p-2 flex items-center justify-between gap-2 cursor-pointer" 
-                    >
-                        <div className="flex gap-2 items-center">
-                            <div className="bg-zinc-800 flex items-center justify-center rounded-sm aspect-square min-w-10 ">
-                                <FiUsers className=" size-6" />
-                            </div>
-                            
-                            <div className="flex flex-col">
-                                <div className="text-sm text-left">Users Profile</div>
-                                <p className="text-xs opacity-70" >View and update users information</p>
-                            </div>
-                        </div>
+                    {
+                        userInfo.role === 'admin' ? (
+                            <button 
+                                onClick={() => {setUserInfoModalVisible(true)}}
+                                className="rounded-lg bg-zinc-900 w-full p-2 flex items-center justify-between gap-2 cursor-pointer" 
+                            >
+                                <div className="flex gap-2 items-center">
+                                    <div className="bg-zinc-800 flex items-center justify-center rounded-sm aspect-square min-w-10 ">
+                                        <FiUsers className=" size-6" />
+                                    </div>
+                                    
+                                    <div className="flex flex-col">
+                                        <div className="text-sm text-left">Users Profile</div>
+                                        <p className="text-xs opacity-70" >View and update users information</p>
+                                    </div>
+                                </div>
 
-                        <FiChevronRight />
-                    </button>
-                    
+                                <FiChevronRight />
+                            </button> 
+                        ) : null
+                    }
+                
                     <button 
                         onClick={() => {
                             localStorage.removeItem('token');
@@ -149,6 +157,10 @@ export default function SettingPage() {
             
             <PasswordUpdateModal
                 visible={isPasswordModalVisible} setVisible={setPasswordModalVisible}
+            />
+
+            <UsersInfoModal 
+                visible={isUserInfoModalVisible} setVisible={setUserInfoModalVisible}
             />
         </div>
     )
@@ -197,6 +209,23 @@ function PersnalInfoUpdateModal({visible, setVisible}) {
 
 
 function PasswordUpdateModal({visible, setVisible}) {
+
+    const [error, setError] = useState('');
+
+    const data = useRef({oldPassword: '', newPassword: ''})
+
+
+    function handlePasswordUpdate() {
+        if(!data.current.oldPassword || !data.current.newPassword) {
+            setError('Please fill all information');
+            return ;
+        }
+        updatePassword(data.current).then(res => {
+            if(res.ok) setVisible(false);
+            setError('fail to update password')
+        })
+    }
+
     return (
         <CenterModal 
             title={'Update Password '} 
@@ -208,14 +237,90 @@ function PasswordUpdateModal({visible, setVisible}) {
             <InputText  
                 label={'Current Password'}
                 placeholder={'Enter full Name'}
+                onChange={(e) => {data.current.oldPassword = e.target.value}}
             />
             
             <InputText  
                 label={'New Password'}
-                placeholder={'Enter username'}          
+                placeholder={'Enter username'}     
+                onChange={(e) => {data.current.newPassword = e.target.value; setError('')}}
+                errorMsg={error}     
             />
 
-            <Button>Update</Button>
+            <Button onClick={handlePasswordUpdate}>Update</Button>
+        </CenterModal>
+    )
+}
+
+
+function UsersInfoModal({visible, setVisible}) {
+    const {allUsers, fetchAllUsers} = useStore()
+    
+    const [users, setUsers] = useState(allUsers ?? []);
+
+    function handleUpdateRole({role, id}) {
+        updateRole({id, role}).then(res => {
+            if(res){
+                setVisible(false);
+                fetchAllUsers()
+            }
+        })
+    }
+
+    useEffect(() => {
+        fetchAllUsers()
+    }, []);
+
+    useEffect(() => {
+        setUsers(allUsers)
+    }, [allUsers])
+
+    return (
+        <CenterModal
+            visible={visible} setVisible={setVisible}
+            title={'Select User'}
+            containerClassName="max-w-[500px] max-h-[90vh] w-full flex flex-col"
+            className="gap-5 flex flex-col pt-5 flex-1 relative overflow-hidden"
+        >
+
+            <label className="px-5 h-10 shrink-0 rounded-lg bg-zinc-800 flex items-center gap-4">
+                <IoSearchOutline />
+                <input 
+                    type="text" 
+                    autoComplete={'false'} 
+                    placeholder="Enter your query" 
+                    className="outline-none flex-1 border-0"
+                    onChange={(e) => {
+                        setUsers(
+                            allUsers.filter(item => item.name?.startsWith(e.target.value))
+                        )
+                    }}
+                />
+            </label>
+
+            <div className="flex flex-col gap-1 w-full overflow-y-scroll pr-2">
+                {
+                    users?.map(item => (
+                        <div 
+                            key={item._id} 
+                            className="rounded-lg bg-zinc-800 w-full px-5 h-10 flex items-center justify-between shrink-0" 
+                            onClick={() => {
+                            }}
+                        >
+                            <div>{item.name}</div>
+                            <div className="opacity-80 flex items-center gap-1">
+                             
+                                    <UnderlineText onClick={() => {handleUpdateRole({role: 'manager', id: item._id})}} 
+                                    isActive={item.role == 'manager'} >manager</UnderlineText>
+
+                                    <UnderlineText onClick={() => {handleUpdateRole({role: 'user', id: item._id})}}  
+                                    isActive={item.role == 'user'} >user</UnderlineText>
+                              
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
         </CenterModal>
     )
 }

@@ -23,13 +23,13 @@ export async function updatePassword(data) {
         body: JSON.stringify(data)
     })
 
-    if(res.ok) return
+    return (res.ok)
 }
 
 
 
 export async function updateInfo(data) {
-    let res = await fetch(`${BASE_URL}/api/user/`, {
+    let res = await fetch(`${BASE_URL}/user/`, {
         method: 'PUT',
         headers: {
             'content-type': "application/json",
@@ -66,4 +66,18 @@ export async function getUserById(id) {
     })
 
     return await res.json();
+}
+
+
+export async function updateRole(data) {
+     let res = await fetch(`${BASE_URL}/user/role`, {
+        method: 'PATCH',
+        headers: {
+            'content-type': "application/json",
+            'authorization': `Bearer ${localStorage.getItem('token') ?? ''}`
+        },
+        body: JSON.stringify(data)
+    })
+
+    return (res.ok);
 }
